@@ -19,7 +19,7 @@ class SitesController < ApplicationController
     @links = @site.links
     respond_to do |f|
       f.html
-      f.json { render :json => @site }
+      f.json { render :json => @site.as_json(include: :links) }
     end
   end
 
@@ -32,6 +32,15 @@ class SitesController < ApplicationController
         redirect_to new_site_path
       end
       f.json {render :json  => {:error => err.message}, :status => 422}
+    end
+  end
+
+  rescue_from ActionController::RoutingError, :only => :new do |err|
+    respond_to do |f|
+      f.html do 
+        redirect_to new_site_path
+      end
+      f.json {render :json  => {:error => err.message}, :status => 404}
     end
   end
 
